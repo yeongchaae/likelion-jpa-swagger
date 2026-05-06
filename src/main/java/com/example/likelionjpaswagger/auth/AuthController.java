@@ -13,7 +13,9 @@ public class AuthController {
 
     @PostMapping("/login")
     public TokenResponse login(@RequestBody LoginRequest request) {
+
         String token = jwtTokenProvider.createToken(request.getEmail());
+
         return new TokenResponse(token);
     }
 }

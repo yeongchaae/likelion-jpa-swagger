@@ -1,5 +1,6 @@
 package com.example.likelionjpaswagger.jwt;
 
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +17,7 @@ public class JwtTokenProvider {
     private String secretKey;
 
     public String createToken(String email) {
+
         Date now = new Date();
         Date expiredDate = new Date(now.getTime() + 1000 * 60 * 60);
 
@@ -28,6 +30,7 @@ public class JwtTokenProvider {
     }
 
     public String getEmail(String token) {
+
         return Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
@@ -36,8 +39,24 @@ public class JwtTokenProvider {
                 .getSubject();
     }
 
+    public boolean validateToken(String token) {
+
+        try {
+            Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token);
+
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
     private SecretKey getSigningKey() {
+
         byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
+
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
